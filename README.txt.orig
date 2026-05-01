@@ -1,0 +1,66 @@
+Java4gba : Java Virtual Machine for GBA by Torlus
+=================================================
+
+Finally, here is the source. Please grab the demo from my website if you don't have it,
+as it contains some explanation about that small work.
+
+The code is a bit messy, and is provided "as is". I wanted to clean it up a bit but well,
+I'm a bit lazy :) and I'd rather work on KVM ports for other platforms...
+
+The work is based on Unix version of KVM. I created a directory called VmSkel under the kvm
+directory, and then did more or less what's recommended in Sun's "KVM Porting Guide".
+
+So you will find most of my work under that kvm/VmSkel directory (Skel stands for Skeleton,
+because the first thing I did was to change/remove all stuff that wasn't fully portable).
+
+Due to some portability issues, I made some changes to kvm/VmCommon files :
+- I added an option to disable the class verifier. The class verifier unexpectedly fails on
+  verifying some classes, although they work perfectly.
+- Console output used "putchar" function, that I replaced with my custom "putchar_md" function.
+
+To build VmSkel example, just cd to kvm/VmSkel/build and run "go.bat". 
+You'll need DevKitAdvance release 5.
+
+Now let's have a look at source files (located in kvm/VmSkel/src) : 
+- gba_main.c contains the startup code.
+- gba_runtime.c contains some GBA-specific functions. According to Sun's KVM porting guide,
+  this file should contain all platform-specific stuff (mosty date/time and memory stuff).
+  But with the GBA, a lot of other things are missing : there is no trivial console, memory
+  management or clock... You have to do it all by yourself. That's what are all the other 
+  files for.
+- printf.c manages console output. The code mainly comes from JaysOS (which uses code 
+  mainly coming from BSD). Maybe I should have used Damian Yerrick's AGBTTY...
+- malloc.c is a simple malloc() and free() implementation. It mainly comes from JaysOS too.
+- nativeFunctionTableGBA.c and ROMjavaGBA.c were machine-generated files (see stuff about
+  JavaCodeCompact, ROMizing, and jcc directory for more information). These files that contain
+  CLDC classes have been modified a bit, in order to put some stuff in EWRAM instead of IWRAM.
+- gbfs.h and libgbfs.c are Damian Yerrick's GBFS stuff, a bit modified.
+- math.c contains a fmod() implementation. It then allows KVM to be linked without -lm.
+- loaderGBFS.c comes from loaderFile.c in VmExtra directory. It provides all file-based operations
+  needed by the KVM, on top of GBFS.
+- finally, gba_font.c and the "gba" subdirectory are some GBA-specific resources.
+
+There are two other files that I used while working on this port : simu_main.c and simu_runtime.c.
+These files basically allow you to test all parts of the port (memory allocation, file system, console
+output...) on the host machine (your computer), instead of doing all the tests (and debugging) on the 
+target (GBA or emulator). 
+
+That's all. Making this port was not very difficult. Sun's code portability is good, and I found all
+the stuff I needed in Justin Armstrong's JaysOS and Damian Yerrick's GBA stuff. Many thanks to them.
+
+Torlus.
+
+Credits
+=======
+
+- Damian Yerrick for his GBFS.
+- Justin Armstrong for his JaysOS.
+
+Links
+=====
+
+ - Sun's pages about J2ME : http://java.sun.com/j2me/index.jsp
+ - Justin Armstrong's JaysOS : http://www.badpint.org/jaysos/
+ - Damian Yerrick's home : http://www.pineight.com/
+ - My own site : http://heliscar.com/greg/ 
+
