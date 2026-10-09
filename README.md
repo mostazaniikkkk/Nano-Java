@@ -11,6 +11,28 @@ Java code: no KVM, no Sun class libraries.
 > Version 2.0 is a complete rewrite. The previous, KVM-based version is
 > kept in the [`1.0` branch](https://github.com/mostazaniikkkk/Nano-Java/tree/1.0).
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/ds-launcher.png" width="256" alt="Game list"><br>Game list</td>
+    <td align="center"><img src="docs/screenshots/ds-title.png" width="256" alt="Title screen and phone keypad"><br>Phone keypad on the touch screen</td>
+    <td align="center"><img src="docs/screenshots/ds-gameplay.png" width="256" alt="Gameplay"><br>In game</td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/ds-menu.png" width="256" alt="Emulator menu"><br>Emulator menu</td>
+    <td align="center"><img src="docs/screenshots/ds-controls.png" width="256" alt="Button mapping"><br>Per-game controls</td>
+    <td align="center">
+      <img src="docs/screenshots/host-graphics.png" width="120" alt="Graphics test">
+      <img src="docs/screenshots/host-ui.png" width="120" alt="High-level UI test"><br>
+      Graphics and high-level UI tests (desktop build)
+    </td>
+  </tr>
+</table>
+
+DS screenshots taken in melonDS. *Sonic Unleashed* is © SEGA / Gameloft and
+is shown only to illustrate compatibility; no games are included.
+
 ## Download
 
 Get `nanojava.nds` from the
