@@ -202,6 +202,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how it works.
 
 ## License
 
-Nano Java is released under the MIT License (see [LICENSE](LICENSE)). The
-built-in font is generated from DejaVu Sans, see
+Nano Java is dedicated to the public domain under
+[CC0 1.0 Universal](LICENSE): you can copy, modify and distribute it, even
+commercially, without asking permission.
+
+The only exception is the built-in font (`src/midp/font_data.c`), which is
+generated from DejaVu Sans and keeps its own permissive license, see
 [docs/FONT_LICENSE](docs/FONT_LICENSE).
