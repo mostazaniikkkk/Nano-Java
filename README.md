@@ -1,9 +1,23 @@
 # Nano Java
 
+[![Build](https://github.com/mostazaniikkkk/Nano-Java/actions/workflows/build.yml/badge.svg)](https://github.com/mostazaniikkkk/Nano-Java/actions/workflows/build.yml)
+
 Nano Java runs J2ME games and applications (MIDlets, CLDC 1.1 / MIDP 2.0)
 on the Nintendo DS. It is a from-scratch implementation: a small Java
 virtual machine in portable C, a class library written mostly in Java, and
-a platform layer for the DS (libnds / calico).
+a platform layer for the DS (libnds / calico). It needs no third-party
+Java code: no KVM, no Sun class libraries.
+
+> Version 2.0 is a complete rewrite. The previous, KVM-based version is
+> kept in the [`1.0` branch](https://github.com/mostazaniikkkk/Nano-Java/tree/1.0).
+
+## Download
+
+Get `nanojava.nds` from the
+[latest release](https://github.com/mostazaniikkkk/Nano-Java/releases/latest).
+Development builds of every commit are available as artifacts of the
+[Build workflow](https://github.com/mostazaniikkkk/Nano-Java/actions/workflows/build.yml)
+(open a run and download `nanojava`).
 
 ## Features
 
@@ -92,6 +106,11 @@ Outputs:
 - `build/nanojava.nds` - the DS ROM
 - `build/classlib.jar` - the class library
 - `build/host/nanojava` - a headless desktop build (Linux), used for tests
+
+GitHub Actions runs the same build and the tests on every push
+(`.github/workflows/build.yml`). Pushing a tag named `v*` (for example
+`v2.0.0`) publishes a release with `nanojava.nds` attached; tags with a
+hyphen (`v2.0.0-beta1`) become pre-releases.
 
 ## The desktop build
 
