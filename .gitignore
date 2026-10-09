@@ -1,77 +1,17 @@
-# Prerequisites
-*.d
-
-# Object files
+/build/
+/rms/
+platform/nds/build/
+platform/nds/*.elf
+platform/nds/*.nds
+platform/nds/*.map
 *.o
-*.ko
-*.obj
+*.ppm
+platform/nds/build-embed/
+
+# Third-party games used for manual testing are not part of the repo.
+tests/*.jar
+tests/*.jad
+platform/nds/arm7/build/
 *.elf
-
-# Linker output
-*.ilk
 *.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-
-# KVM — not redistributable, must be sourced externally (see README)
-kvm/VmCommon/
-kvm/VmExtra/
-kvm/VmUnix/
-kvm/VmWin/
-kvm/VmWinCE/
-
-# KVM top-level infrastructure (bin, build, doc, tools, etc. from Sun's tree)
-bin/
-build/
-doc/
-jam/
-tools/
-demos/
-
-# Build outputs
-*.nds
-kvm/VmSkel/build/obj/
-
-# Compiled Java API classes (generated from api/src/ by javac)
-api/classes/
-
-# Misc artifacts
-;C/
+*.lst

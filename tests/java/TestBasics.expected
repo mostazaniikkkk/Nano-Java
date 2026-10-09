@@ -1,0 +1,44 @@
+-2147483648
+-2147483648
+0
+-3 -1 -4 15
+2 -56 4464 A
+-9223372036854775808
+121932631112635269
+9223372036854775807 -9223372036854775808 -3 -2
+-9223372036854775808
+0.3333333333333333
+7.5
+3 -3 0
+2147483647 -9223372036854775808 9223372036854775807
+1.5 false Infinity
+1.4142135623730951 -2.0 -1.0
+100.0 1.0E10 0.001 1.0E-4 1234.5
+6765
+two hundred minus five other
+ad??
+1002 999
+rect:6 false
+[square:16] true
+3 4 7
+hiHi
+ArrayStoreException
+-5
+false true
+AIOOBE 2
+NPE
+CCE
+AE / by zero
+NASE
+java.lang.RuntimeException: custom
+1 16
+before lazy
+Lazy.<clinit>
+lazy
+lazy
+true false true true
+99162322 0
+TestBasics$Square
+[I [Ljava.lang.String;
+TestBasics$Rect true
+CNFE does.not.Exist

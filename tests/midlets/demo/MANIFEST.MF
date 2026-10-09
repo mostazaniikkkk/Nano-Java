@@ -1,0 +1,6 @@
+MIDlet-Name: Demo
+MIDlet-Version: 1.0
+MIDlet-Vendor: Nano Java
+MIDlet-1: Demo, , demo.DemoMIDlet
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0

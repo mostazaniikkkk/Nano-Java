@@ -1,0 +1,6 @@
+MIDlet-Name: UI
+MIDlet-Version: 1.0
+MIDlet-Vendor: Nano Java
+MIDlet-1: UI, , ui.UIMIDlet
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0

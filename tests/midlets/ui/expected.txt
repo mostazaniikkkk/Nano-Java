@@ -1,0 +1,10 @@
+numeric rejects letters
+maxSize enforced
+textfield 92 size=2 chars=92 max=2 now=92
+exclusive after delete selected=1 size=2
+multiple count=2 idx=-1
+gauge clamped=10
+alert timeout=2000 forever=-2
+item owned once
+form size=0
+form shown

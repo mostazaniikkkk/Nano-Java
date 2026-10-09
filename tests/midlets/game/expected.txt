@@ -1,0 +1,172 @@
+rms run 1
+ok rms same instance
+ok rms empty = 0
+ok rms first id = 1
+ok rms add c = 1
+ok rms add a = 2
+ok rms add b = 3
+ok rms add empty = 4
+ok rms listener = 411
+ok rms next id = 5
+ok rms count = 3
+ok rms version = 6
+ok rms get 2 = aa
+ok rms get empty = null
+ok rms size 2 = 2
+ok rms get into = 1
+ok rms get into data = 99
+ok rms deleted id
+ok rms small buffer
+ok rms size
+ok rms enum count = 2
+ok rms enum sorted = aa c 
+ok rms enum previous = 2
+ok rms enum reset = 2
+ok rms enum destroyed
+ok rms enum all = 3
+ok rms enum first = 1
+ok rms enum updated = 4
+ok rms enum after delete = 4
+ok rms enum last = 5
+ok rms enum end
+ok rms delete open
+ok rms still open = 3
+ok rms closed
+ok rms reopened new
+ok rms reopen count = 3
+ok rms reopen next id = 6
+ok rms reopen version = 8
+ok rms reopen data = cz
+ok rms not found
+ok rms long name
+ok rms other suite
+ok rms own suite lookup
+ok rms list
+ok sprite frames = 4
+ok sprite size = 1616
+ok sprite nextFrame = 1
+ok sprite prevFrame = 3
+ok sprite sequence = 30
+ok sprite sequence wrap = 2
+ok sprite default sequence = 4
+ok sprite bad frame
+ok sprite bad frame size
+ok sprite bad sequence
+ok sprite ref position = 96048
+ok sprite transform 0 pos = 96048
+ok sprite transform 0 ref = 100050
+ok sprite transform 1 pos = 96037
+ok sprite transform 1 ref = 100050
+ok sprite transform 2 pos = 89048
+ok sprite transform 2 ref = 100050
+ok sprite transform 3 pos = 89037
+ok sprite transform 3 ref = 100050
+ok sprite transform 4 pos = 98046
+ok sprite transform 4 ref = 100050
+ok sprite transform 5 pos = 87046
+ok sprite transform 5 ref = 100050
+ok sprite transform 6 pos = 98039
+ok sprite transform 6 ref = 100050
+ok sprite transform 7 pos = 87039
+ok sprite transform 7 ref = 100050
+ok sprite rotated size = 1616
+ok sprite setImage frames = 20
+ok sprite setImage ref = 50050
+ok sprite setImage size = 1632
+ok sprite copy = 43042
+ok collide image rect
+ok collide image transparent
+ok collide image opaque
+ok collide mirror opaque
+ok collide mirror transparent
+ok collide rot90 opaque
+ok collide rot90 transparent
+ok collide same place
+ok collide sprite rect
+ok collide sprite pixels
+ok collide sprite pixels overlap
+ok collide collision rect
+ok collide invisible
+ok collide tiles empty
+ok collide tiles rect
+ok collide tiles transparent
+ok collide tiles pixels
+ok collide animated empty
+ok collide animated tile
+ok tiled size = 160096
+ok tiled animated index = -1
+ok tiled getCell = -1
+ok tiled animated = 3
+ok tiled animated set = 4
+ok tiled bad cell
+ok tiled bad tile
+ok tiled bad animated
+ok lm size = 2
+ok lm order
+ok lm insert existing
+ok lm insert bad index
+ok lm remove
+ok io resource length = 154
+ok io png magic = -1991225785
+ok io http
+ok io missing
+ok nokia fullcanvas command
+ok nokia softkey = -6
+ok nokia createImage = ff00
+ok nokia sound playing = 0
+ok nokia sound stopped = 1
+ok nokia sound events = 12
+ok lm restores clip = 2030100
+ok lm restores translation = 23
+ok lm view pixel = 16777215
+ok lm view pixel 2 = 10823977
+ok lm outside view = 0
+ok lm outside view right = 0
+ok lm sprite pixel = 16776960
+ok sprite transforms drawn = 0
+ok nokia drawImage manipulations = 0
+ok nokia drawPixels int = 16711680
+ok nokia drawPixels flip = 65280
+ok nokia drawPixels rot90 top = 65280
+ok nokia drawPixels rot90 bottom = 16711680
+ok nokia 4444 opaque = 65535
+ok nokia 4444 transparent = 0
+ok nokia 4444 hflip = 65535
+ok nokia 4444 vflip = 65535
+ok nokia 1bit black = 0
+ok nokia 1bit white = 16777215
+ok nokia 1bit masked = 4342338
+ok nokia getPixels 565 = 201663488
+ok nokia polygon inside = 8651007
+ok nokia transparent triangle = 65535
+ok media midi type = audio/midi
+ok media midi duration = 500000
+ok media state unrealized = 100
+ok media wav duration = 500000
+ok media unrealized content type
+ok media state realized = 200
+ok media volume control
+ok media volume clamp = 100
+ok media volume level = 40
+ok media mute
+ok media no tone control
+ok media state prefetched = 300
+ok media unknown duration = -1
+ok media state started = 400
+ok media loop count while started
+ok media stopped time
+ok media stopped state = 300
+ok media loops took ~1s
+ok media end state = 300
+ok media end time = 500000
+ok media unknown ~1s
+ok media deallocated = 200
+ok media events = volumeChanged volumeChanged started endOfMedia endOfMedia closed
+ok media unknown events = started stopped started endOfMedia closed
+ok media closed = 0
+ok media start closed
+ok media tone duration = 1750000
+ok media bad tone
+ok media bad note
+ok media http
+done: 170 checks, 0 failures
