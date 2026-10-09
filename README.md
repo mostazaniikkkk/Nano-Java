@@ -36,7 +36,7 @@ is shown only to illustrate compatibility; no games are included.
 ## Download
 
 Get `nanojava.nds` from the
-[latest release](https://github.com/mostazaniikkkk/Nano-Java/releases/latest).
+[releases page](https://github.com/mostazaniikkkk/Nano-Java/releases).
 Development builds of every commit are available as artifacts of the
 [Build workflow](https://github.com/mostazaniikkkk/Nano-Java/actions/workflows/build.yml)
 (open a run and download `nanojava`).
