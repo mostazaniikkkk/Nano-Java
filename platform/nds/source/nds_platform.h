@@ -12,7 +12,7 @@
 enum { BTN_A, BTN_B, BTN_X, BTN_Y, BTN_L, BTN_R, BTN_START, BTN_SELECT,
        BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, NUM_BUTTONS };
 
-enum { LAYOUT_FIT, LAYOUT_SPAN };
+enum { LAYOUT_FIT, LAYOUT_SPAN, LAYOUT_TOUCH, NUM_LAYOUTS };
 
 /* Pseudo key code that opens the emulator menu instead of reaching Java. */
 #define KEY_MENU 0x10000
@@ -25,13 +25,14 @@ typedef struct PhoneKey {
 
 typedef struct GameSettings {
     int  w, h;                /* phone screen size */
-    int  layout;              /* LAYOUT_FIT or LAYOUT_SPAN */
+    int  layout;              /* LAYOUT_FIT, LAYOUT_SPAN or LAYOUT_TOUCH */
     int  volume;              /* 0-100 */
     bool show_fps;
     int  keys[NUM_BUTTONS];   /* MIDP key code per physical button */
 } GameSettings;
 
 extern const char *const button_names[NUM_BUTTONS];
+extern const char *const layout_names[NUM_LAYOUTS];   /* "fit", ... */
 extern const PhoneKey    phone_keys[];
 extern const int         num_phone_keys;
 
@@ -73,6 +74,9 @@ void ui_init(int top);
  * was tapped, or 0. *on_ui tells whether the touch hit the UI at all. */
 int  ui_touch(bool down, int x, int y, bool *on_ui);
 void ui_soft_labels(const char *left, const char *right);
+/* Touch layout: the game is on the touch screen and the top screen shows
+ * the button map, the soft key commands and the FPS. */
+void ui_info_init(const GameSettings *s);
 void ui_show_fps(int fps, int busy_percent);
 /* Runs the emulator menu until it is closed (the game is paused meanwhile).
  * Returns an EXIT_* action. */

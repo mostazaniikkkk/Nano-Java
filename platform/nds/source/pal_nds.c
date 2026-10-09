@@ -7,6 +7,8 @@
  *    phone keypad and the emulator menu (ui.c).
  *  - span: the phone screen is shown 1:1 across both screens (a 256x384
  *    area) and the rest of the touch screen gets a compact keypad.
+ *  - touch: the phone screen is on the touch screen (scaled like in fit),
+ *    so touch-driven games can be played; the top screen shows information.
  * Physical buttons are mapped to phone keys per game.
  */
 #include <nds.h>
@@ -139,6 +141,8 @@ static int  canvas_w = 240, canvas_h = 320;
 static int  ox, oy;                 /* canvas position on its screen(s) */
 static bool span;                   /* canvas spans both screens */
 static bool soft_scaled;            /* scaled in software (too big for VRAM) */
+static bool on_sub;                 /* fit/touch: the canvas is on the touch screen */
+static int  aff_sx = 256, aff_sy = 256, aff_x0, aff_y0;   /* hardware scaling */
 static int  out_w, out_h;           /* displayed size of a soft-scaled canvas */
 static int *xmap, *ymap;            /* displayed pixel -> canvas pixel */
 
@@ -155,17 +159,35 @@ static uint16_t *row_ptr(int vy)
     return vy < SCREEN_H ? BG_GFX + vy * 256 : BG_GFX_SUB + (vy - SCREEN_H) * 256;
 }
 
-/* Sets the top screen's BG3 transform: screen pixel (x, y) shows bitmap
- * pixel ((x - x0) * sx, (y - y0) * sy), with steps in 8.8 fixed point. */
-static void set_affine(int sx, int sy, int x0, int y0)
+/* Sets a screen's BG3 transform: screen pixel (x, y) shows bitmap pixel
+ * ((x - x0) * sx, (y - y0) * sy), with steps in 8.8 fixed point. */
+static void set_affine(bool sub, int sx, int sy, int x0, int y0)
 {
-    REG_BG3PA = (int16_t)sx;
-    REG_BG3PB = 0;
-    REG_BG3PC = 0;
-    REG_BG3PD = (int16_t)sy;
-    REG_BG3X = -x0 * sx;
-    REG_BG3Y = -y0 * sy;
+    if (sub) {
+        REG_BG3PA_SUB = (int16_t)sx;
+        REG_BG3PB_SUB = 0;
+        REG_BG3PC_SUB = 0;
+        REG_BG3PD_SUB = (int16_t)sy;
+        REG_BG3X_SUB = -x0 * sx;
+        REG_BG3Y_SUB = -y0 * sy;
+    } else {
+        REG_BG3PA = (int16_t)sx;
+        REG_BG3PB = 0;
+        REG_BG3PC = 0;
+        REG_BG3PD = (int16_t)sy;
+        REG_BG3X = -x0 * sx;
+        REG_BG3Y = -y0 * sy;
+    }
 }
+
+/* The bitmap that holds the canvas in fit and touch layouts. */
+static uint16_t *game_fb(void)
+{
+    return on_sub ? BG_GFX_SUB : BG_GFX;
+}
+
+/* Draws the UI that goes with the current layout. */
+static void layout_ui(void);
 
 /* Bottom row of the canvas on the touch screen in span layout (0 if the
  * canvas fits on the top screen); the keypad goes below it. */
@@ -194,13 +216,15 @@ static void video_layout(void)
     free(ymap);
     xmap = ymap = NULL;
     soft_scaled = false;
+    set_affine(false, 256, 256, 0, 0);
+    set_affine(true, 256, 256, 0, 0);
 
     span = settings->layout == LAYOUT_SPAN && w <= VW && h <= VH;
+    on_sub = settings->layout == LAYOUT_TOUCH;
     if (span) {
         ox = (VW - w) / 2;
         oy = h <= SCREEN_H ? (SCREEN_H - h) / 2 : 0;
-        set_affine(256, 256, 0, 0);
-        ui_init(span_ui_top());
+        layout_ui();
         return;
     }
 
@@ -220,7 +244,11 @@ static void video_layout(void)
         int shown_w = w * 256 / sx, shown_h = h * 256 / sy;
         ox = 0;
         oy = 0;
-        set_affine(sx, sy, (256 - shown_w) / 2, (SCREEN_H - shown_h) / 2);
+        aff_sx = sx;
+        aff_sy = sy;
+        aff_x0 = (256 - shown_w) / 2;
+        aff_y0 = (SCREEN_H - shown_h) / 2;
+        set_affine(on_sub, sx, sy, aff_x0, aff_y0);
     } else {
         /* Too big for the bitmap: scale in software (nearest neighbour). */
         soft_scaled = true;
@@ -239,9 +267,20 @@ static void video_layout(void)
             ymap[i] = i * h / out_h;
         ox = (256 - out_w) / 2;
         oy = (SCREEN_H - out_h) / 2;
-        set_affine(256, 256, 0, 0);
     }
-    ui_init(0);
+    layout_ui();
+}
+
+static void layout_ui(void)
+{
+    if (span) {
+        ui_init(span_ui_top());
+    } else if (on_sub) {
+        ui_init(SCREEN_H);   /* no keypad: the game has the touch screen */
+        ui_info_init(settings);
+    } else {
+        ui_init(0);
+    }
 }
 
 void nds_session_start(GameSettings *s, const char *jar)
@@ -306,11 +345,13 @@ void pal_present(const uint16_t *px, int w, int h)
         for (int y = 0; y < h; y++)
             copy_row(row_ptr(oy + y) + ox, px + y * w, w);
     } else if (!soft_scaled) {
+        uint16_t *fb = game_fb();
         for (int y = 0; y < h; y++)
-            copy_row(BG_GFX + y * 256, px + y * w, w);
+            copy_row(fb + y * 256, px + y * w, w);
     } else {
+        uint16_t *fb = game_fb();
         for (int y = 0; y < out_h; y++) {
-            uint16_t       *dst = BG_GFX + (oy + y) * 256 + ox;
+            uint16_t       *dst = fb + (oy + y) * 256 + ox;
             const uint16_t *src = px + ymap[y] * w;
             for (int x = 0; x < out_w; x++)
                 dst[x] = src[xmap[x]];
@@ -343,10 +384,29 @@ static bool touching;
 static bool touch_on_canvas;
 static int  last_tx, last_ty;
 
-/* Converts a touch-screen point to canvas coordinates. Only possible in
- * span layout; otherwise the canvas is on the top screen, without touch. */
+/* Converts a touch-screen point to canvas coordinates, in the layouts
+ * that show the canvas on the touch screen (span and touch). */
 static bool touch_to_canvas(int tx, int ty, int *cx, int *cy)
 {
+    if (on_sub && !span) {
+        int vx, vy;
+        if (soft_scaled) {
+            vx = tx - ox;
+            vy = ty - oy;
+            if (vx < 0 || vy < 0 || vx >= out_w || vy >= out_h)
+                return false;
+            vx = xmap[vx];
+            vy = ymap[vy];
+        } else {
+            vx = (tx - aff_x0) * aff_sx / 256;
+            vy = (ty - aff_y0) * aff_sy / 256;
+        }
+        if (tx < aff_x0 || ty < aff_y0 || vx < 0 || vy < 0 || vx >= canvas_w || vy >= canvas_h)
+            return false;
+        *cx = vx;
+        *cy = vy;
+        return true;
+    }
     if (!span)
         return false;
     int vx = tx - ox, vy = ty + SCREEN_H - oy;
@@ -361,7 +421,14 @@ static void open_menu(void)
 {
     int64_t      start = raw_time_ms();
     GameSettings before = *settings;
+    /* In the touch layout the touch screen shows the game scaled; the menu
+     * is drawn 1:1. */
+    bool scaled_sub = on_sub && !span && !soft_scaled;
+    if (scaled_sub)
+        set_affine(true, 256, 256, 0, 0);
     int action = ui_menu_run(settings, game_jar, nds_storage_ok && game_jar != NULL);
+    if (scaled_sub)
+        set_affine(true, aff_sx, aff_sy, aff_x0, aff_y0);
     paused_ms += raw_time_ms() - start;
     if (action != EXIT_NONE) {
         nds_exit_action = action;
@@ -373,7 +440,11 @@ static void open_menu(void)
     if (before.layout != settings->layout)
         video_layout();   /* the game's next frame fills the screen again */
     else
-        ui_init(span ? span_ui_top() : 0);
+        layout_ui();
+    /* A touch that closed the menu must not reach the game: treat it as
+     * already handled until the stylus is lifted. */
+    touching = (keysHeld() & KEY_TOUCH) != 0;
+    touch_on_canvas = false;
     /* Let go of keys that may have been held when the menu opened. */
     for (int b = 0; b < NUM_BUTTONS; b++)
         if (before.keys[b] && before.keys[b] != KEY_MENU)
@@ -384,6 +455,12 @@ static void poll_hardware(void)
 {
     scanKeys();
     uint32_t down = keysDown(), up = keysUp(), held = keysHeld();
+    /* START+SELECT always opens the menu, whatever the button map says. */
+    if ((held & (KEY_START | KEY_SELECT)) == (KEY_START | KEY_SELECT) &&
+        (down & (KEY_START | KEY_SELECT))) {
+        open_menu();
+        return;
+    }
     for (int b = 0; b < NUM_BUTTONS; b++) {
         int code = settings->keys[b];
         if (!code)

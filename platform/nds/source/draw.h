@@ -17,6 +17,11 @@
 
 #define BOLD 1
 
+/* Screen-sized RAM buffers shared by the launcher and the touch UI (they
+ * never run at the same time), for the top (main) and touch (sub) screens. */
+extern uint16_t draw_buf_main[DRAW_W * DRAW_H];
+extern uint16_t draw_buf_sub[DRAW_W * DRAW_H];
+
 void draw_target(uint16_t *buf);
 void draw_flush(volatile uint16_t *vram, int y1, int y2);
 

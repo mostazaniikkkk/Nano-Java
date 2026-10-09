@@ -5,6 +5,8 @@
  * With the "fit" layout the whole touch screen is UI: soft keys, call/end,
  * a D-pad ring with OK, and the 3x4 number pad. With "span" the game uses
  * part of the touch screen and the rest gets a compact one-row keypad.
+ * With "touch" the game has the whole touch screen and the top screen shows
+ * an information panel instead (button map, soft key commands, FPS).
  */
 #include <nds.h>
 
@@ -55,7 +57,12 @@ static int  pressed_key = -1;    /* index in keys[], -1 for the ring */
 static char soft_label[2][24] = {"", ""};
 
 /* The touch screen is drawn here and copied to VRAM (see draw.h). */
-static uint16_t buf[W * H];
+#define buf draw_buf_sub
+
+/* Touch layout: the information panel on the top screen. */
+static bool                info_mode;
+static const GameSettings *info_settings;
+static char                info_fps[24];
 
 static void flush_rows(int y1, int y2)
 {
@@ -214,6 +221,7 @@ static void redraw(void)
 void ui_init(int top)
 {
     draw_target(buf);
+    info_mode = false;
     ui_top = top;
     full = top == 0;
     n_keys = 0;
@@ -229,6 +237,51 @@ void ui_init(int top)
     flush();
 }
 
+/* ------------------------------------------------------------------------ */
+/* Information panel (touch layout)                                         */
+
+static void draw_info(void)
+{
+    const GameSettings *s = info_settings;
+    draw_target(draw_buf_main);
+    draw_vgradient(0, 0, W, H, 0x1C2B4C, 0x0C1222);
+    draw_text("Nano Java", 8, 4, 1, BOLD, C_WHITE);
+
+    /* Soft keys: the commands the game offers right now. */
+    int y = 24;
+    for (int i = 0; i < 2; i++) {
+        int x = i ? W / 2 + 4 : 8;
+        draw_round_rect(x, y, W / 2 - 12, 24, 6, 0x2A3A5E, 0x3E5684);
+        draw_text(i ? "Soft R" : "Soft L", x + 6, y + 2, 0, 0, C_DIM);
+        draw_text_in(*soft_label[i] ? soft_label[i] : "-", x + 6, y + 11, 0, BOLD, C_WHITE,
+                     x + 4, x + W / 2 - 16);
+    }
+
+    /* The button map, in two columns. */
+    y = 56;
+    draw_text("Controls", 8, y, 0, BOLD, 0xA4B3CF);
+    y += 12;
+    for (int b = 0; b < NUM_BUTTONS; b++) {
+        int x = b < NUM_BUTTONS / 2 ? 8 : W / 2 + 4;
+        int row = y + (b % (NUM_BUTTONS / 2)) * 13;
+        draw_text(button_names[b], x, row, 0, 0, C_DIM);
+        draw_text(phone_key_by_code(s->keys[b])->label, x + 50, row, 0, BOLD, C_WHITE);
+    }
+
+    draw_text("START+SELECT: menu", 8, H - 14, 0, 0, C_DIM);
+    if (info_fps[0])
+        draw_text(info_fps, W - 8 - draw_text_width(info_fps, 0, 0), H - 14, 0, 0, 0x60FF60);
+    draw_flush(BG_GFX, 0, H);
+    draw_target(buf);
+}
+
+void ui_info_init(const GameSettings *s)
+{
+    info_mode = true;
+    info_settings = s;
+    draw_info();
+}
+
 void ui_soft_labels(const char *left, const char *right)
 {
     draw_target(buf);
@@ -237,6 +290,10 @@ void ui_soft_labels(const char *left, const char *right)
         if (strcmp(soft_label[s], l[s]) == 0)
             continue;
         snprintf(soft_label[s], sizeof soft_label[s], "%s", l[s]);
+        if (info_mode) {
+            draw_info();
+            continue;
+        }
         for (int i = 0; i < n_keys; i++)
             if (keys[i].code == (s ? -7 : -6))
                 draw_key(i, pressed_key == i);
@@ -248,6 +305,11 @@ void ui_show_fps(int fps, int busy)
 {
     draw_target(buf);
     char txt[8];
+    if (info_mode) {
+        snprintf(info_fps, sizeof info_fps, "%d fps, CPU %d%%", fps, busy);
+        draw_info();
+        return;
+    }
     if (H - ui_top < 40)
         return;
     draw_rect(0, H - 26, TAB_W, 26, C_TAB);
@@ -354,7 +416,7 @@ static void value_row(int y, bool sel, const char *name, const char *value, bool
 
 static void draw_main_menu(const GameSettings *s, int sel, bool can_change)
 {
-    char buf[32];
+    char value[32];
     header("Nano Java", PANEL_W);
     for (int i = 0; i < M_COUNT; i++) {
         int y = HEADER_H + i * ROW_H;
@@ -364,15 +426,17 @@ static void draw_main_menu(const GameSettings *s, int sel, bool can_change)
         case M_CHANGE:   value_row(y, sel == i, "Change game", NULL, can_change, PANEL_W); break;
         case M_CONTROLS: value_row(y, sel == i, "Controls", NULL, true, PANEL_W); break;
         case M_SCREEN:
-            snprintf(buf, sizeof buf, "%dx%d", s->w, s->h);
-            value_row(y, sel == i, "Screen", buf, true, PANEL_W);
+            snprintf(value, sizeof value, "%dx%d", s->w, s->h);
+            value_row(y, sel == i, "Screen", value, true, PANEL_W);
             break;
         case M_LAYOUT:
-            value_row(y, sel == i, "Layout", s->layout == LAYOUT_FIT ? "Fit" : "Span", true, PANEL_W);
+            value_row(y, sel == i, "Layout",
+                      s->layout == LAYOUT_FIT ? "Fit" : s->layout == LAYOUT_SPAN ? "Span" : "Touch",
+                      true, PANEL_W);
             break;
         case M_VOLUME:
-            snprintf(buf, sizeof buf, "%d%%", s->volume);
-            value_row(y, sel == i, "Volume", buf, true, PANEL_W);
+            snprintf(value, sizeof value, "%d%%", s->volume);
+            value_row(y, sel == i, "Volume", value, true, PANEL_W);
             break;
         case M_FPS:
             value_row(y, sel == i, "Show FPS", s->show_fps ? "On" : "Off", true, PANEL_W);
@@ -505,6 +569,12 @@ int ui_menu_run(GameSettings *s, const char *jar, bool can_change)
     const uint32_t *vram = (const uint32_t *)BG_GFX_SUB;
     for (int i = 0; i < ui_top * W / 2; i++)
         ((uint32_t *)buf)[i] = vram[i];
+    /* In the touch layout the whole touch screen is the game: keep a copy
+     * to put back when the menu closes (the top screen's buffer is free
+     * meanwhile; the panel is redrawn afterwards). */
+    bool game_behind = ui_top >= H;
+    if (game_behind)
+        memcpy(draw_buf_main, buf, sizeof draw_buf_main);
     dim_from(PANEL_W);
     while (open) {
         draw_main_menu(s, sel, can_change);
@@ -561,7 +631,7 @@ int ui_menu_run(GameSettings *s, const char *jar, bool can_change)
             cycle_size(s, dir);
             break;
         case M_LAYOUT:
-            s->layout = s->layout == LAYOUT_FIT ? LAYOUT_SPAN : LAYOUT_FIT;
+            s->layout = (s->layout + (dir < 0 ? NUM_LAYOUTS - 1 : 1)) % NUM_LAYOUTS;
             break;
         case M_VOLUME:
             s->volume += dir * 10;
@@ -573,6 +643,10 @@ int ui_menu_run(GameSettings *s, const char *jar, bool can_change)
         }
     }
 
+    if (game_behind) {
+        memcpy(buf, draw_buf_main, sizeof draw_buf_main);
+        flush_rows(0, H);
+    }
     if (memcmp(&before, s, sizeof before) != 0)
         settings_save(jar, s);
     /* A new screen size only takes effect when the game starts again. */

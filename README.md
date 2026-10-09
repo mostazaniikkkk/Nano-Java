@@ -86,11 +86,18 @@ emulator menu, which pauses the game:
 - **Restart game** / **Change game** (back to the list, no reboot needed)
 - **Controls**: map each DS button to any phone key, per game
 - **Screen**: the phone screen size (the game restarts to apply it)
-- **Layout**: *Fit* (game on the top screen) or *Span* (the game shown 1:1
-  across both screens, with a compact keypad below it; touching the game
-  sends pointer events)
+- **Layout**:
+  - *Fit*: the game on the top screen, the phone keypad on the touch screen.
+  - *Span*: the game shown 1:1 across both screens, with a compact keypad
+    below it.
+  - *Touch*: the game on the touch screen, for games played by tapping;
+    the top screen shows the button map, the soft key commands and the FPS.
+
+  In *Span* and *Touch*, touching the game sends pointer events to it.
 - **Volume** and **Show FPS** (frames per second and CPU load, shown under
   the menu tab)
+
+**START+SELECT** always opens the menu, whatever the button map says.
 
 Default controls:
 

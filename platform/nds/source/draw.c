@@ -6,6 +6,9 @@
 #include "draw.h"
 #include "../../../src/midp/gfx.h"
 
+uint16_t draw_buf_main[DRAW_W * DRAW_H];
+uint16_t draw_buf_sub[DRAW_W * DRAW_H];
+
 static Surface target = {NULL, NULL, DRAW_W, DRAW_H};
 static Clip    whole = {0, 0, DRAW_W, DRAW_H};
 

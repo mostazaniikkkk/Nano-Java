@@ -141,8 +141,14 @@ Video layouts:
   software. The touch screen is all UI.
 - **Span**: the two screens form a 256x384 area and the canvas is shown 1:1
   across them; the touch screen rows below the canvas get a compact keypad.
+- **Touch**: like Fit, but on the touch screen's engine, so touch-driven
+  games can be played; touches are mapped back through the scaling to
+  canvas coordinates. The top screen shows an information panel (button
+  map, soft key commands, FPS). While the menu is open the touch screen's
+  scaling is switched off so the menu is drawn 1:1, and the game image is
+  saved and restored around it.
 
-The UI draws into a RAM buffer that is copied to VRAM with 32-bit writes
-(VRAM ignores byte writes). While the emulator menu is open the VM is
+The UI draws into RAM buffers (shared with the launcher, see `draw.h`) that
+are copied to VRAM with 32-bit writes (VRAM ignores byte writes). While the emulator menu is open the VM is
 simply not scheduled, and the VM clock (`pal_time_ms`) is paused so games
 do not see a time jump.

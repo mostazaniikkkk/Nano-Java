@@ -2,7 +2,8 @@
  * settings.c - per-game settings, kept next to the jar in <name>.ini:
  *
  *   screen=176x208     phone screen size
- *   layout=fit         fit (top screen, scaled if needed) or span (both)
+ *   layout=fit         fit (top screen, scaled if needed), span (1:1 on
+ *                      both screens) or touch (game on the touch screen)
  *   volume=80          J2ME volume, 0-100
  *   fps=0              show frames per second
  *   key.A=fire         physical button -> phone key (see phone_keys)
@@ -17,6 +18,8 @@
 const char *const button_names[NUM_BUTTONS] = {
     "A", "B", "X", "Y", "L", "R", "Start", "Select", "Up", "Down", "Left", "Right"
 };
+
+const char *const layout_names[NUM_LAYOUTS] = {"fit", "span", "touch"};
 
 const PhoneKey phone_keys[] = {
     {"none", "-", 0},
@@ -100,7 +103,9 @@ void settings_load(const char *jar, GameSettings *s)
             s->w = w;
             s->h = h;
         } else if (strcmp(key, "layout") == 0) {
-            s->layout = strcmp(val, "span") == 0 ? LAYOUT_SPAN : LAYOUT_FIT;
+            for (int l = 0; l < NUM_LAYOUTS; l++)
+                if (strcmp(val, layout_names[l]) == 0)
+                    s->layout = l;
         } else if (strcmp(key, "volume") == 0) {
             int v = atoi(val);
             s->volume = v < 0 ? 0 : v > 100 ? 100 : v;
@@ -126,7 +131,7 @@ void settings_save(const char *jar, const GameSettings *s)
     if (!f)
         return;
     fprintf(f, "screen=%dx%d\nlayout=%s\nvolume=%d\nfps=%d\n", s->w, s->h,
-            s->layout == LAYOUT_SPAN ? "span" : "fit", s->volume, s->show_fps ? 1 : 0);
+            layout_names[s->layout], s->volume, s->show_fps ? 1 : 0);
     for (int b = 0; b < NUM_BUTTONS; b++)
         fprintf(f, "key.%s=%s\n", button_names[b], phone_key_by_code(s->keys[b])->id);
     fclose(f);

@@ -71,8 +71,6 @@ typedef struct {
 
 static Game     games[MAX_FILES];
 static int      n_games;
-static uint16_t top_buf[DRAW_W * DRAW_H];
-static uint16_t bottom_buf[DRAW_W * DRAW_H];
 
 /* ------------------------------------------------------------------------ */
 /* Reading games                                                            */
@@ -419,7 +417,7 @@ static void pill(int x, int y, const char *key, const char *label)
 
 static void draw_top(const Game *g)
 {
-    draw_target(top_buf);
+    draw_target(draw_buf_main);
     draw_vgradient(0, 0, DRAW_W, DRAW_H, C_BG_TOP, C_BG_BOTTOM);
     draw_text("Nano Java", 8, 4, 1, BOLD, C_WHITE);
     draw_text("J2ME for DS", 8 + draw_text_width("Nano Java ", 1, BOLD), 6, 0, 0, C_FAINT);
@@ -491,7 +489,7 @@ static void draw_scrollbar(int top, int count)
 static void draw_game_list(int sel, int top)
 {
     char count[16];
-    draw_target(bottom_buf);
+    draw_target(draw_buf_sub);
     draw_vgradient(0, 0, DRAW_W, DRAW_H, C_LIST_BG, C_BG_BOTTOM);
     snprintf(count, sizeof count, "%d", n_games);
     draw_header("Games", count, false);
@@ -512,7 +510,7 @@ static void draw_game_list(int sel, int top)
 
 static void draw_midlet_list(const Game *g, int sel)
 {
-    draw_target(bottom_buf);
+    draw_target(draw_buf_sub);
     draw_vgradient(0, 0, DRAW_W, DRAW_H, C_LIST_BG, C_BG_BOTTOM);
     draw_header("Choose", NULL, true);
     for (int i = 0; i < g->n_midlets && i < ROWS; i++) {
@@ -617,7 +615,7 @@ char *nds_launcher_pick(char **midlet_class)
     scan();
     if (n_games == 0) {
         draw_top(NULL);
-        draw_target(bottom_buf);
+        draw_target(draw_buf_sub);
         draw_vgradient(0, 0, DRAW_W, DRAW_H, C_LIST_BG, C_BG_BOTTOM);
         draw_header("Games", "0", false);
         draw_flush(BG_GFX_SUB, 0, DRAW_H);
